@@ -10,6 +10,7 @@ import org.skypro.skyshop.search.Searchable;
 import org.skypro.skyshop.search.BestResultNotFound;
 
 import java.util.List;
+import java.util.Map;
 
 import org.skypro.skyshop.article.Article;
 
@@ -148,40 +149,39 @@ public class App {
             System.out.println("Исключение: " + e.getMessage());
         }
         System.out.println();
-        System.out.println();
         System.out.println("Добавлено элементов: " + searchEngine.getCount());
         System.out.println("Проверка поиска по слову 'Телефон'");
-        List<Searchable> results1 = searchEngine.search("Телефон");
+        Map<String, Searchable> results1 = searchEngine.search("Телефон");
         System.out.println("Результат: " + results1.size());
         System.out.println("Детализация:");
         int counter = 1;
-        for (Searchable result : results1) {
-            System.out.println((counter++) + ". " + result.getStringRepresentation());
+        for (Map.Entry<String, Searchable> entry : results1.entrySet()) {
+            System.out.println(entry.getValue().getStringRepresentation());
         }
         System.out.println();
 
-        System.out.println("Поиск по слову 'выбрать' (встречается в статьях)");
-        List<Searchable> results2 = searchEngine.search("выбрать");
+        System.out.println("Поиск по слову 'выбрать'");
+        Map<String, Searchable> results2 = searchEngine.search("выбрать");
         System.out.println("Найдено результатов: " + results2.size());
         System.out.println("Детализация:");
         counter = 1;
-        for (Searchable result : results2) {
-            System.out.println(counter++ + ". " + result.getStringRepresentation());
+        for (Map.Entry<String, Searchable> entry : results2.entrySet()) {
+            System.out.println(entry.getValue().getStringRepresentation());
         }
         System.out.println();
 
         System.out.println("Поиск по части слова 'план'");
-        List<Searchable> results3 = searchEngine.search("план");
+        Map<String, Searchable> results3 = searchEngine.search("план");
         System.out.println("Найдено результатов: " + results3.size());
         System.out.println("Детализация:");
-        for (Searchable result : results3) {
-            System.out.println("• " + result.getStringRepresentation());
+        for (Map.Entry<String, Searchable> entry : results3.entrySet()) {
+            System.out.println(entry.getValue().getStringRepresentation());
         }
         System.out.println();
 
 
         System.out.println("Поиск по несуществующему слову 'автомобиль'");
-        List<Searchable> results4 = searchEngine.search("автомобиль");
+        Map<String, Searchable> results4 = searchEngine.search("автомобиль");
         System.out.println("Найдено результатов: " + results4.size());
         if (results4.isEmpty()) {
             System.out.println("(ничего не найдено)");
@@ -189,7 +189,7 @@ public class App {
         System.out.println();
 
         System.out.println("Поиск по букве 'и' :");
-        List<Searchable> results5 = searchEngine.search("и");
+        Map<String, Searchable> results5 = searchEngine.search("и");
         System.out.println("Найдено результатов: " + results5.size());
         System.out.println();
 
