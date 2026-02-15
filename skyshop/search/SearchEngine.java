@@ -1,81 +1,87 @@
 package org.skypro.skyshop.search;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class SearchEngine {
-    private List<Searchable> searchableItems;
+    private Searchable[] searchables;
+    private int count;
 
-    public SearchEngine(int capacity) {
-        this.searchableItems = new ArrayList<>(capacity);
+    public SearchEngine(int size) {
+        this.searchables = new Searchable[size];
+        this.count = 0;
     }
 
-    private int countOccurrences(String source, String substring) {
-        if (source == null || substring == null || substring.isEmpty()) {
-            return 0;
-        }
-
-        int count = 0;
-        int index = 0;
-        String sourceLower = source.toLowerCase();
-        String substringLower = substring.toLowerCase();
-
-        while (true) {
-            index = sourceLower.indexOf(substringLower, index);
-            if (index == -1) {
-                break;
-            }
+    public void add(Searchable searchable) {
+        if (count < searchables.length) {
+            searchables[count] = searchable;
             count++;
-            index += substringLower.length();
+        } else {
+            System.out.println("Невозможно добавить элемент: хранилище переполнено");
         }
+    }
 
+    public int getCount() {
         return count;
     }
 
-    public Searchable findBestMatch(String search) throws BestResultNotFound {
-        if (searchableItems.isEmpty()) {
-            throw new BestResultNotFound(search);
+    public Map<String, Searchable> search(String searchTerm) {
+
+        Map<String, Searchable> resultMap = new TreeMap<>();
+
+        String lowerCaseSearchTerm = searchTerm.toLowerCase();
+
+        for (int i = 0; i < count; i++) {
+            Searchable searchable = searchables[i];
+
+            if (searchable.getSearchTerm().toLowerCase().contains(lowerCaseSearchTerm)) {
+                resultMap.put(searchable.getName(), searchable);
+            }
+        }
+
+        return resultMap;
+    }
+
+    public Searchable findBestMatch(String searchTerm) throws BestResultNotFound {
+        if (searchTerm == null || searchTerm.isBlank()) {
+            throw new BestResultNotFound("Поисковый запрос не может быть пустым");
         }
 
         Searchable bestMatch = null;
         int maxOccurrences = 0;
+        String lowerCaseSearchTerm = searchTerm.toLowerCase();
 
-        for (Searchable item : searchableItems) {
-            String searchTerm = item.getSearchTerm();
-            int occurrences = countOccurrences(searchTerm, search);
+        for (int i = 0; i < count; i++) {
+            Searchable current = searchables[i];
+            String content = current.getSearchTerm().toLowerCase();
+
+            int occurrences = countOccurrences(content, lowerCaseSearchTerm);
 
             if (occurrences > maxOccurrences) {
                 maxOccurrences = occurrences;
-                bestMatch = item;
+                bestMatch = current;
             }
         }
 
         if (bestMatch == null) {
-            throw new BestResultNotFound(search);
+            throw new BestResultNotFound("Не найден подходящий результат для запроса: " + searchTerm);
         }
 
         return bestMatch;
     }
 
-    public void add(Searchable item) {
-        searchableItems.add(item);
-    }
-
-    public List<Searchable> search(String searchString) {
-        List<Searchable> results = new ArrayList<>();
-        for (Searchable item : searchableItems) {
-            if (item.getSearchTerm().toLowerCase().contains(searchString.toLowerCase())){
-                results.add(item);
-            }
+    private int countOccurrences(String text, String searchTerm) {
+        if (searchTerm.isEmpty()) {
+            return 0;
         }
-        return results;
-    }
 
-    public int getCount() {
-        return searchableItems.size();
-    }
+        int count = 0;
+        int index = 0;
 
-    public int getCapacity() {
-        return Integer.MAX_VALUE;
+        while ((index = text.indexOf(searchTerm, index)) != -1) {
+            count++;
+            index += searchTerm.length();
+        }
+
+        return count;
     }
 }
